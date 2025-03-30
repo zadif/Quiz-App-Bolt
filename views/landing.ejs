@@ -1,0 +1,37 @@
+<div class="hero-section">
+  <div class="container py-5">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="display-4 fw-bold text-white mb-4 animate-text">Welcome to QuizMaster</h1>
+        <p class="lead text-white-75 mb-5 animate-text delay-1">Challenge yourself with our diverse collection of quizzes. Choose your category and start testing your knowledge today!</p>
+      </div>
+      <div class="col-lg-6 d-none d-lg-block">
+        <img src="https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?auto=format&fit=crop&q=80&w=800" 
+             alt="Quiz Hero" 
+             class="img-fluid rounded-4 shadow-lg animate-image">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="categories-section py-5">
+  <div class="container">
+    <h2 class="text-center mb-5">Choose Your Challenge</h2>
+    
+    <div class="row g-4">
+      <% categories.forEach(category => { %>
+        <div class="col-md-6 col-lg-3">
+          <a href="/quiz/<%= category.id %>" class="text-decoration-none">
+            <div class="category-card h-100">
+              <div class="p-4 text-center">
+                <i class="fas <%= category.icon %> fa-3x mb-3 text-primary"></i>
+                <h3 class="h5 mb-2"><%= category.title %></h3>
+                <p class="small text-muted mb-0"><%= category.description %></p>
+              </div>
+            </div>
+          </a>
+        </div>
+      <% }); %>
+    </div>
+  </div>
+</div>
