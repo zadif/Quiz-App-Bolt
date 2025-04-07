@@ -107,17 +107,198 @@ body.dark-mode .explanation-modal {
   display: none; /* Ensure chat box is hidden */
 }
 
-/* Hero Section */
+/* Hero Section - Enhanced with Image */
 .hero-section {
   background: linear-gradient(
     135deg,
     var(--gradient-start),
     var(--gradient-end)
   );
-  padding: 80px 0;
-  margin-bottom: 2rem;
+  padding: 60px 0;
+  margin-bottom: 30px;
   position: relative;
   overflow: hidden;
+}
+
+/* Hero container layout */
+.hero-section .container {
+  position: relative;
+  z-index: 2;
+}
+
+/* Hero text styles */
+.hero-section .hero-text {
+  text-align: left;
+  padding-right: 20px;
+}
+
+/* Hero image container - Enhanced */
+.hero-section .hero-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 250px;
+  position: relative;
+}
+
+.hero-section .hero-image::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.hero-section .hero-image:hover::after {
+  opacity: 1;
+}
+
+.hero-section .hero-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+  object-fit: cover;
+  max-height: 350px;
+}
+
+.hero-section h1,
+.hero-section .display-4 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.hero-section p,
+.hero-section .lead {
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Dark Mode - Hero Section */
+body.dark-mode .hero-section {
+  background: linear-gradient(135deg, #121212, #333333);
+}
+
+body.dark-mode .hero-section h1,
+body.dark-mode .hero-section p,
+body.dark-mode .hero-section .display-4,
+body.dark-mode .hero-section .lead {
+  color: #e0e0e0;
+}
+
+body.dark-mode .hero-section .btn-primary {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 40px 0;
+  }
+
+  .hero-section .display-4 {
+    font-size: 2rem;
+  }
+
+  .hero-section .lead {
+    font-size: 1.1rem;
+  }
+
+  .hero-text {
+    margin-bottom: 30px;
+    text-align: center;
+  }
+}
+
+body.dark-mode:root {
+  --gradient-start: #121212;
+  --gradient-end: #333333;
+  --primary-color: #0d6efd;
+}
+
+/* Make sure hero text is visible in dark mode */
+body.dark-mode .hero-section h1,
+body.dark-mode .hero-section p {
+  color: #e0e0e0;
+}
+
+/* Additional styling for the hero elements in dark mode */
+body.dark-mode .hero-section .btn-primary {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: white;
+}
+
+/* Dark mode for category cards */
+body.dark-mode .category-card {
+  background-color: #1e1e1e;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .category-card:hover {
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+}
+
+/* Fix category card content colors in dark mode */
+body.dark-mode .category-card .card-body {
+  background-color: #1e1e1e;
+}
+
+body.dark-mode .category-card .category-icon {
+  background-color: #333333 !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .category-card i.fas,
+body.dark-mode .category-card i.fa,
+body.dark-mode .category-card i.fab {
+  color: #e0e0e0 !important;
+}
+
+/* Fix text colors in category cards */
+body.dark-mode .category-card h1,
+body.dark-mode .category-card h2,
+body.dark-mode .category-card h3,
+body.dark-mode .category-card h4,
+body.dark-mode .category-card h5,
+body.dark-mode .category-card h6,
+body.dark-mode .category-card p,
+body.dark-mode .category-card span,
+body.dark-mode .category-card div,
+body.dark-mode .category-card a {
+  color: #e0e0e0 !important;
+}
+
+/* Fix any blue text elements */
+body.dark-mode .category-card .text-primary,
+body.dark-mode .category-card .text-info,
+body.dark-mode .category-card .text-blue {
+  color: #a0c4ff !important; /* Light blue for dark mode */
+}
+
+/* Fix any dark/black text */
+body.dark-mode .category-card .text-dark,
+body.dark-mode .category-card .text-black,
+body.dark-mode .category-card .text-body {
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .category-card .btn-primary,
+body.dark-mode .category-card .bg-primary {
+  background-color: #444444 !important;
+  border-color: #444444 !important;
 }
 
 /* Category Cards */
@@ -232,6 +413,49 @@ body.dark-mode .explanation-modal {
   line-height: 1.6;
 }
 
+/* Updated Explanation Styles */
+.explanation-section {
+  margin-top: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.explanation-toggle {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.explanation-toggle:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.explanation-content {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+body.dark-mode .explanation-content {
+  background-color: #333333;
+  color: #e0e0e0;
+  border-color: #444 !important;
+}
+
+body.dark-mode .explanation-toggle {
+  border-color: #444;
+  color: #e0e0e0;
+}
+
+body.dark-mode .explanation-toggle:hover {
+  background-color: #444;
+  color: #fff;
+}
+
 /* Progress Modal */
 .progress-modal {
   display: block;
@@ -289,14 +513,31 @@ body.dark-mode .explanation-modal {
   right: -400px;
   top: 0;
   width: 400px;
+  min-width: 300px;
+  max-width: 90vw;
   height: 100vh;
   background: white;
   box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
-  transition: right 0.3s ease;
+  transition: right 0.3s ease, width 0.3s ease;
   display: flex;
   flex-direction: column;
   z-index: 1001;
-  cursor: move; /* Make the chat box draggable */
+  cursor: default;
+  overflow: hidden;
+}
+
+.chat-sidebar.resizing {
+  transition: none;
+}
+
+.resize-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 100%;
+  cursor: ew-resize;
+  background-color: transparent;
 }
 
 body.dark-mode .chat-sidebar {
@@ -317,6 +558,16 @@ body.dark-mode .chat-sidebar {
 
 body.dark-mode .chat-header {
   background-color: #444444; /* Change header color in dark mode */
+}
+
+.chat-header .btn-close {
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.chat-header .btn-close:hover {
+  opacity: 1;
 }
 
 .chat-messages {
@@ -350,6 +601,32 @@ body.dark-mode .chat-header {
 body.dark-mode .chat-input .btn-primary {
   background-color: #e0e0e0;
   color: #333333;
+}
+
+/* Chat Input */
+.chat-input .form-control {
+  transition: none;
+  box-shadow: none;
+}
+
+.chat-input .form-control:hover,
+.chat-input .form-control:focus,
+.chat-input .form-control:active {
+  box-shadow: none;
+  border-color: #ced4da;
+  outline: none;
+  transition: none;
+  transform: none;
+}
+
+.chat-input .form-control:focus {
+  border-color: var(--primary-color);
+}
+
+body.dark-mode .chat-input .form-control:hover,
+body.dark-mode .chat-input .form-control:focus,
+body.dark-mode .chat-input .form-control:active {
+  border-color: #444;
 }
 
 /* Footer */
@@ -888,12 +1165,26 @@ body.dark-mode .category-header {
 /* Navbar Styles */
 .navbar {
   background-color: var(--primary-color);
-  color: white;
+  padding: 1rem;
 }
 
 body.dark-mode .navbar {
   background-color: #333333;
   color: #e0e0e0;
+}
+
+.navbar-brand {
+  font-weight: 600;
+  font-size: 1.4rem;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.navbar-dark .navbar-nav .nav-link.active {
+  color: white;
+  font-weight: 600;
 }
 
 /* Remove blue outline on button focus */
@@ -1156,4 +1447,68 @@ body.dark-mode .modal-footer {
 body.dark-mode .copy-btn:hover {
   background-color: #e0e0e0;
   color: #333333;
+}
+
+/* Custom Quiz Section Styles */
+.custom-quiz-section {
+  background-color: #f0f7ff;
+  border-radius: 15px;
+  margin: 2rem 0;
+  padding: 2rem 0;
+}
+
+body.dark-mode .custom-quiz-section {
+  background-color: #1a2430;
+}
+
+.custom-quiz-section .category-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.custom-quiz-section .category-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.custom-quiz-section .category-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode .custom-quiz-section .category-card {
+  background-color: #1e1e1e;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .custom-quiz-section .category-card:hover {
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .custom-quiz-section .category-card .card-title,
+body.dark-mode .custom-quiz-section .category-card .card-text {
+  color: #e0e0e0;
+}
+
+body.dark-mode .custom-quiz-section h2,
+body.dark-mode .custom-quiz-section .lead {
+  color: #e0e0e0;
+}
+
+/* Featured Quizzes Section */
+.bg-light {
+  background-color: #f8f9fa;
+  padding: 2rem 0;
+  border-radius: 0;
+}
+
+body.dark-mode .bg-light {
+  background-color: #1a2430;
 }

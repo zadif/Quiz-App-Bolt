@@ -53,13 +53,27 @@
                   <button
                     class="btn btn-outline-primary option-btn w-100 mb-3"
                     data-correct="<%= optionIndex === question.correctAnswer %>"
-                    data-explanation="<%= question.explanation %>"
+                    data-explanation="<%= encodeURIComponent(question.explanation) %>"
                     onclick="checkAnswer(this, <%= optionIndex === question.correctAnswer %>)"
                   >
                     <%= option %>
                   </button>
                   <% }); %>
                 </div>
+
+                <!-- New explanation section that shows up after answering -->
+                <div class="explanation-section mt-4" style="display: none">
+                  <button
+                    class="btn btn-outline-info w-100 mb-2 explanation-toggle"
+                  >
+                    <i class="fas fa-lightbulb me-2"></i>View Explanation
+                  </button>
+                  <div
+                    class="explanation-content p-3 border rounded"
+                    style="display: none"
+                  ></div>
+                </div>
+                <!-- Note: explanation content is now empty and will be filled by JavaScript -->
               </div>
             </div>
           </div>
@@ -121,17 +135,12 @@
         <button class="chat-button" onclick="toggleChat()">
           <i class="fas fa-comment-dots"></i>
         </button>
-        <div
-          class="chat-sidebar"
-          draggable="true"
-          ondragstart="dragStart(event)"
-          ondragend="dragEnd(event)"
-        >
+        <div class="chat-sidebar">
           <div class="chat-header p-3 text-white">
             <h5 class="mb-0">AI Assistant</h5>
             <button
               class="btn-close btn-close-white"
-              onclick="toggleChat()"
+              onclick="closeChat()"
             ></button>
           </div>
           <div class="chat-messages" id="chatMessages"></div>
@@ -149,6 +158,7 @@
               </button>
             </div>
           </div>
+          <div class="resize-handle"></div>
         </div>
       </div>
 

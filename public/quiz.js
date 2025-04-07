@@ -118,10 +118,42 @@ function checkAnswer(button, isCorrect) {
     });
   }
 
-  // Show explanation
-  const explanation = button.dataset.explanation;
-  if (explanation) {
-    showExplanation(explanation);
+  // Get the explanation from the button's data attribute and decode it
+  const explanation = decodeURIComponent(button.dataset.explanation || "");
+
+  // Show explanation section
+  const card = button.closest(".card-body");
+  const explanationSection = card.querySelector(".explanation-section");
+
+  if (explanationSection) {
+    explanationSection.style.display = "block";
+
+    const explanationToggle = explanationSection.querySelector(
+      ".explanation-toggle"
+    );
+    const explanationContent = explanationSection.querySelector(
+      ".explanation-content"
+    );
+
+    if (explanationContent && explanation) {
+      // Set the explanation content safely
+      explanationContent.innerHTML = explanation;
+    }
+
+    if (explanationToggle) {
+      // Remove any existing event listeners to prevent duplicates
+      const newToggle = explanationToggle.cloneNode(true);
+      explanationToggle.parentNode.replaceChild(newToggle, explanationToggle);
+
+      // Add the event listener to the new element
+      newToggle.addEventListener("click", function () {
+        const isVisible = explanationContent.style.display === "block";
+        explanationContent.style.display = isVisible ? "none" : "block";
+        this.innerHTML = isVisible
+          ? '<i class="fas fa-lightbulb me-2"></i>View Explanation'
+          : '<i class="fas fa-times me-2"></i>Hide Explanation';
+      });
+    }
   }
 
   document.getElementById("nextBtn").disabled = false;
@@ -345,11 +377,111 @@ function updateReviewNavigation() {
   }
 }
 
-// Chat functionality
+// Chat functions - updating the toggle and close functionality
 function toggleChat() {
-  const sidebar = document.querySelector(".chat-sidebar");
-  sidebar.classList.toggle("open");
+  const chatSidebar = document.querySelector(".chat-sidebar");
+  if (chatSidebar) {
+    const isOpen = chatSidebar.classList.contains("open");
+
+    if (isOpen) {
+      closeChat();
+    } else {
+      chatSidebar.classList.add("open");
+      // Initialize resize handle after opening
+      setTimeout(initResizeHandle, 100);
+    }
+  }
 }
+
+function closeChat() {
+  const chatSidebar = document.querySelector(".chat-sidebar");
+  if (chatSidebar) {
+    chatSidebar.classList.remove("open");
+    // Reset width to default when closing
+    chatSidebar.style.width = "";
+  }
+}
+
+// Initialize resize handle
+function initResizeHandle() {
+  const sidebar = document.querySelector(".chat-sidebar");
+  const handle = document.querySelector(".resize-handle");
+
+  if (!handle || !sidebar) return;
+
+  let startX, startWidth;
+
+  handle.addEventListener("mousedown", function (e) {
+    startX = e.clientX;
+    startWidth = parseInt(
+      document.defaultView.getComputedStyle(sidebar).width,
+      10
+    );
+    sidebar.classList.add("resizing");
+
+    document.addEventListener("mousemove", resizeMove);
+    document.addEventListener("mouseup", resizeEnd);
+
+    e.preventDefault(); // Prevent text selection
+  });
+
+  // Touch support
+  handle.addEventListener("touchstart", function (e) {
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      startX = touch.clientX;
+      startWidth = parseInt(
+        document.defaultView.getComputedStyle(sidebar).width,
+        10
+      );
+      sidebar.classList.add("resizing");
+
+      document.addEventListener("touchmove", resizeTouchMove);
+      document.addEventListener("touchend", resizeTouchEnd);
+
+      e.preventDefault(); // Prevent scrolling
+    }
+  });
+
+  function resizeMove(e) {
+    const width = startWidth - (e.clientX - startX);
+    setWidth(width);
+  }
+
+  function resizeTouchMove(e) {
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      const width = startWidth - (touch.clientX - startX);
+      setWidth(width);
+    }
+  }
+
+  function setWidth(width) {
+    // Enforce min and max constraints
+    const minWidth = 300;
+    const maxWidth = window.innerWidth * 0.9;
+
+    if (width < minWidth) width = minWidth;
+    if (width > maxWidth) width = maxWidth;
+
+    sidebar.style.width = width + "px";
+  }
+
+  function resizeEnd() {
+    document.removeEventListener("mousemove", resizeMove);
+    document.removeEventListener("mouseup", resizeEnd);
+    sidebar.classList.remove("resizing");
+  }
+
+  function resizeTouchEnd() {
+    document.removeEventListener("touchmove", resizeTouchMove);
+    document.removeEventListener("touchend", resizeTouchEnd);
+    sidebar.classList.remove("resizing");
+  }
+}
+
+// Remove old drag functions since we no longer need them
+// dragStart and dragEnd functions can be removed
 
 async function sendMessage() {
   const input = document.getElementById("chatInput");
@@ -387,17 +519,35 @@ function addMessage(text, type) {
   messages.scrollTop = messages.scrollHeight;
 }
 
-// Dark Mode
-function toggleDarkMode() {
-  document.body.classList.toggle("dark-mode");
-  const isDarkMode = document.body.classList.contains("dark-mode");
-  localStorage.setItem("darkMode", isDarkMode ? "enabled" : "disabled");
+// Dark Mode functions
+// These should be kept if dark-mode.js isn't properly included yet
+// If dark-mode.js is included, these act as fallbacks
+if (typeof toggleDarkMode !== "function") {
+  function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+    const isDarkMode = document.body.classList.contains("dark-mode");
+    localStorage.setItem("darkMode", isDarkMode ? "enabled" : "disabled");
+
+    // Update icon if it exists
+    const icon = document.querySelector("#darkModeToggle i");
+    if (icon) {
+      icon.className = isDarkMode ? "fas fa-sun" : "fas fa-moon";
+    }
+  }
 }
 
-function initializeDarkMode() {
-  const darkMode = localStorage.getItem("darkMode");
-  if (darkMode === "enabled") {
-    document.body.classList.add("dark-mode");
+if (typeof initializeDarkMode !== "function") {
+  function initializeDarkMode() {
+    const darkMode = localStorage.getItem("darkMode");
+    if (darkMode === "enabled") {
+      document.body.classList.add("dark-mode");
+
+      // Update icon if it exists
+      const icon = document.querySelector("#darkModeToggle i");
+      if (icon) {
+        icon.className = "fas fa-sun";
+      }
+    }
   }
 }
 
@@ -405,25 +555,25 @@ function initializeDarkMode() {
 document.addEventListener("DOMContentLoaded", () => {
   initializeProgress();
   initializeDarkMode();
+
+  // Add event listener for chat toggle to initialize resize handle
+  const chatBtn = document.querySelector(".chat-button");
+  if (chatBtn) {
+    chatBtn.addEventListener("click", function () {
+      // Give the chat time to open before initializing the resize handle
+      setTimeout(initResizeHandle, 100);
+    });
+  }
+
+  // Add event listener for close button
+  const closeBtn = document.querySelector(".chat-header .btn-close");
+  if (closeBtn) {
+    closeBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      closeChat();
+    });
+  }
 });
-
-function dragStart(event) {
-  event.dataTransfer.setData("text/plain", null);
-  const style = window.getComputedStyle(event.target, null);
-  const str =
-    parseInt(style.getPropertyValue("left"), 10) -
-    event.clientX +
-    "," +
-    (parseInt(style.getPropertyValue("top"), 10) - event.clientY);
-  event.dataTransfer.setData("text/plain", str);
-}
-
-function dragEnd(event) {
-  const offset = event.dataTransfer.getData("text/plain").split(",");
-  const dm = document.querySelector(".chat-sidebar");
-  dm.style.left = event.clientX + parseInt(offset[0], 10) + "px";
-  dm.style.top = event.clientY + parseInt(offset[1], 10) + "px";
-}
 
 function copyQuestionToChat(question) {
   const chatInput = document.getElementById("chatInput");
@@ -433,6 +583,8 @@ function copyQuestionToChat(question) {
   const sidebar = document.querySelector(".chat-sidebar");
   if (!sidebar.classList.contains("open")) {
     toggleChat();
+    // Initialize resize handle after opening
+    setTimeout(initResizeHandle, 100);
   }
 
   // Focus on the input
