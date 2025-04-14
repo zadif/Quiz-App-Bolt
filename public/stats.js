@@ -24,7 +24,7 @@ function updateStats() {
                 <div class="list-group-item">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="mb-1">
+                            <h6 class="mb-1 stats-heading>
                                 <i class="fas fa-book me-2"></i>${quiz.category}
                             </h6>
                             <small class="text-muted">

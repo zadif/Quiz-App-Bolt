@@ -121,38 +121,44 @@ function checkAnswer(button, isCorrect) {
   // Get the explanation from the button's data attribute and decode it
   const explanation = decodeURIComponent(button.dataset.explanation || "");
 
-  // Show explanation section
+  // Show explanation section only if there's actual content
   const card = button.closest(".card-body");
   const explanationSection = card.querySelector(".explanation-section");
 
   if (explanationSection) {
-    explanationSection.style.display = "block";
+    // Only display the explanation section if there's actual content
+    if (explanation && explanation.trim() !== "") {
+      explanationSection.style.display = "block";
 
-    const explanationToggle = explanationSection.querySelector(
-      ".explanation-toggle"
-    );
-    const explanationContent = explanationSection.querySelector(
-      ".explanation-content"
-    );
+      const explanationToggle = explanationSection.querySelector(
+        ".explanation-toggle"
+      );
+      const explanationContent = explanationSection.querySelector(
+        ".explanation-content"
+      );
 
-    if (explanationContent && explanation) {
-      // Set the explanation content safely
-      explanationContent.innerHTML = explanation;
-    }
+      if (explanationContent) {
+        // Set the explanation content safely
+        explanationContent.innerHTML = explanation;
+      }
 
-    if (explanationToggle) {
-      // Remove any existing event listeners to prevent duplicates
-      const newToggle = explanationToggle.cloneNode(true);
-      explanationToggle.parentNode.replaceChild(newToggle, explanationToggle);
+      if (explanationToggle) {
+        // Remove any existing event listeners to prevent duplicates
+        const newToggle = explanationToggle.cloneNode(true);
+        explanationToggle.parentNode.replaceChild(newToggle, explanationToggle);
 
-      // Add the event listener to the new element
-      newToggle.addEventListener("click", function () {
-        const isVisible = explanationContent.style.display === "block";
-        explanationContent.style.display = isVisible ? "none" : "block";
-        this.innerHTML = isVisible
-          ? '<i class="fas fa-lightbulb me-2"></i>View Explanation'
-          : '<i class="fas fa-times me-2"></i>Hide Explanation';
-      });
+        // Add the event listener to the new element
+        newToggle.addEventListener("click", function () {
+          const isVisible = explanationContent.style.display === "block";
+          explanationContent.style.display = isVisible ? "none" : "block";
+          this.innerHTML = isVisible
+            ? '<i class="fas fa-lightbulb me-2"></i>View Explanation'
+            : '<i class="fas fa-times me-2"></i>Hide Explanation';
+        });
+      }
+    } else {
+      // If there's no explanation, ensure the section is hidden
+      explanationSection.style.display = "none";
     }
   }
 
@@ -524,6 +530,7 @@ function addMessage(text, type) {
 // If dark-mode.js is included, these act as fallbacks
 if (typeof toggleDarkMode !== "function") {
   function toggleDarkMode() {
+    document.documentElement.classList.toggle("dark-mode");
     document.body.classList.toggle("dark-mode");
     const isDarkMode = document.body.classList.contains("dark-mode");
     localStorage.setItem("darkMode", isDarkMode ? "enabled" : "disabled");
@@ -540,6 +547,7 @@ if (typeof initializeDarkMode !== "function") {
   function initializeDarkMode() {
     const darkMode = localStorage.getItem("darkMode");
     if (darkMode === "enabled") {
+      document.documentElement.classList.add("dark-mode");
       document.body.classList.add("dark-mode");
 
       // Update icon if it exists

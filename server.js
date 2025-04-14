@@ -21,7 +21,6 @@ const quizCategories = [
   // Define any remaining categories here
   // Biology has been completely removed
 ];
-
 // Function to scan the data directory for custom question files
 async function getCustomDataFiles() {
   try {
@@ -172,6 +171,7 @@ app.get("/quiz/custom/:filename", async (req, res) => {
 app.post("/chat", async (req, res) => {
   try {
     const { message } = req.body;
+    console.log(message);
     const result = await model.generateContent(message);
     const response = await result.response;
     res.json({ response: response.text() });
