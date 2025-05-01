@@ -14,7 +14,7 @@ const port = 3000;
 
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
 // Quiz categories (removed biology)
 const quizCategories = [
@@ -59,6 +59,64 @@ app.set("view engine", "ejs");
 app.set("views", join(__dirname, "views"));
 app.use(ejsLayouts);
 app.use(express.static("public"));
+
+// Add a constant to track if styles.css exists
+let stylesExist = false;
+
+// Create style.css if it doesn't exist
+(async function createStylesIfNeeded() {
+  try {
+    const cssDir = join(__dirname, "public", "css");
+    const stylePath = join(cssDir, "style.css");
+
+    // Create css directory if it doesn't exist
+    try {
+      await fs.mkdir(cssDir, { recursive: true });
+    } catch (err) {
+      if (err.code !== "EEXIST") throw err;
+    }
+
+    // Check if style.css exists
+    try {
+      await fs.access(stylePath);
+      stylesExist = true;
+    } catch (err) {
+      // Create the file with basic dark mode styles
+      const cssContent = `/* Dark mode styles */
+html.dark-mode,
+body.dark-mode {
+  background-color: #222;
+  color: #f0f0f0;
+}
+
+.dark-mode .card,
+.dark-mode .list-group-item {
+  background-color: #333 !important;
+  color: #f0f0f0 !important;
+  border-color: #444 !important;
+}
+
+.dark-mode h1, .dark-mode h2, .dark-mode h3,
+.dark-mode h4, .dark-mode h5, .dark-mode h6,
+.dark-mode p, .dark-mode .card-title, 
+.dark-mode .card-text, .dark-mode .text-muted {
+  color: #f0f0f0 !important;
+}
+
+.dark-mode .option-btn:not(.correct):not(.incorrect) {
+  background-color: #333 !important;
+  color: #f0f0f0 !important;
+  border-color: #666 !important;
+}`;
+
+      await fs.writeFile(stylePath, cssContent);
+      stylesExist = true;
+      console.log("Created style.css with dark mode styles");
+    }
+  } catch (error) {
+    console.error("Error checking/creating styles:", error);
+  }
+})();
 
 // Routes
 app.get("/", async (req, res) => {
@@ -167,7 +225,7 @@ app.get("/quiz/custom/:filename", async (req, res) => {
   }
 });
 
-// Chat endpoint
+//Chat endpoint
 app.post("/chat", async (req, res) => {
   try {
     const { message } = req.body;
@@ -188,6 +246,26 @@ app.get("/additional-quizzes", async (req, res) => {
   res.render("additional-quizzes", {
     title: "Additional Quizzes - QuizMaster",
     customCategories: customCategories,
+    // Use a simple variable to add a script to initialize dark mode
+    extraScript: `<script>
+      document.addEventListener('DOMContentLoaded', function() {
+        if (localStorage.getItem('darkMode') === 'enabled') {
+          document.documentElement.classList.add('dark-mode');
+          document.body.classList.add('dark-mode');
+          // Apply styles to specific elements
+          setTimeout(function() {
+            document.querySelectorAll('.card, .list-group-item').forEach(el => {
+              el.style.backgroundColor = '#333';
+              el.style.color = '#f0f0f0';
+              el.style.borderColor = '#444';
+            });
+            document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, .card-title, .card-text').forEach(el => {
+              el.style.color = '#f0f0f0';
+            });
+          }, 100);
+        }
+      });
+    </script>`,
   });
 });
 

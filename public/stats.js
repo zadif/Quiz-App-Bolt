@@ -24,7 +24,7 @@ function updateStats() {
                 <div class="list-group-item">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="mb-1 stats-heading>
+                            <h6 class="mb-1 stats-heading">
                                 <i class="fas fa-book me-2"></i>${quiz.category}
                             </h6>
                             <small class="text-muted">
@@ -123,8 +123,173 @@ function resetStats() {
 // Initialize dark mode and stats on page load
 document.addEventListener("DOMContentLoaded", () => {
   updateStats();
-  const darkMode = localStorage.getItem("darkMode");
-  if (darkMode === "enabled") {
-    document.body.classList.add("dark-mode");
-  }
+
+  // Fix broken HTML in stats history
+  fixStatsHistoryMarkup();
+
+  // Initialize dark mode with a slight delay to ensure DOM is ready
+  setTimeout(() => {
+    applyStatsDarkMode();
+
+    // Ensure dark mode toggle works on stats page
+    const darkModeToggle = document.getElementById("darkModeToggle");
+    if (darkModeToggle) {
+      // Remove existing listeners and create a fresh one
+      const newToggle = darkModeToggle.cloneNode(true);
+      darkModeToggle.parentNode.replaceChild(newToggle, darkModeToggle);
+
+      newToggle.addEventListener("click", function () {
+        // Show loader during transition
+        showDarkModeLoader();
+
+        // Toggle dark mode after a small delay
+        setTimeout(() => {
+          // Toggle dark mode
+          document.body.classList.toggle("dark-mode");
+          document.documentElement.classList.toggle("dark-mode");
+
+          const isDarkMode = document.body.classList.contains("dark-mode");
+          localStorage.setItem("darkMode", isDarkMode ? "enabled" : "disabled");
+
+          // Update icon
+          const icon = this.querySelector("i");
+          if (icon) {
+            icon.className = isDarkMode ? "fas fa-sun" : "fas fa-moon";
+          }
+
+          applyStatsDarkMode();
+
+          // Hide loader after transition
+          setTimeout(hideDarkModeLoader, 300);
+        }, 50);
+      });
+    }
+  }, 100);
 });
+
+// Fix broken markup in stats history
+function fixStatsHistoryMarkup() {
+  // Find and fix missing quote in stats heading class
+  const headings = document.querySelectorAll('h6[class="mb-1 stats-heading]');
+  headings.forEach((heading) => {
+    heading.className = "mb-1 stats-heading";
+  });
+}
+
+// Function to specifically apply dark mode to stats page
+function applyStatsDarkMode() {
+  const isDarkMode = localStorage.getItem("darkMode") === "enabled";
+
+  if (isDarkMode) {
+    document.body.classList.add("dark-mode");
+    document.documentElement.classList.add("dark-mode");
+
+    // Apply custom styles for stats page elements
+    document
+      .querySelectorAll(".list-group-item, .card, .modal-content")
+      .forEach((el) => {
+        el.style.backgroundColor = "#333";
+        el.style.color = "#f0f0f0";
+        el.style.borderColor = "#444";
+      });
+
+    document
+      .querySelectorAll(".card-title, .modal-title, h1, h2, h3, h4, h5, h6, p")
+      .forEach((el) => {
+        el.style.color = "#f0f0f0";
+      });
+
+    document
+      .querySelectorAll(".text-muted, .stats-heading small")
+      .forEach((el) => {
+        el.style.color = "#aaa !important";
+      });
+
+    // Style badge elements specifically
+    document.querySelectorAll(".badge").forEach((el) => {
+      if (
+        !el.classList.contains("bg-success") &&
+        !el.classList.contains("bg-primary") &&
+        !el.classList.contains("bg-warning") &&
+        !el.classList.contains("bg-danger")
+      ) {
+        el.style.backgroundColor = "#555";
+        el.style.color = "#fff";
+      }
+    });
+  } else {
+    // Remove custom styles in light mode
+    document
+      .querySelectorAll(
+        ".list-group-item, .card, .text-muted, .stats-heading, .card-title, .modal-title, .modal-content, h1, h2, h3, h4, h5, h6, p, .badge"
+      )
+      .forEach((el) => {
+        el.style.backgroundColor = "";
+        el.style.color = "";
+        el.style.borderColor = "";
+      });
+  }
+}
+
+// Show loader during dark mode transition
+function showDarkModeLoader() {
+  // Check if loader already exists
+  let loader = document.getElementById("dark-mode-loader");
+
+  if (!loader) {
+    loader = document.createElement("div");
+    loader.id = "dark-mode-loader";
+    loader.innerHTML = `<div class="loader-spinner"></div>`;
+    loader.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.3s ease;
+    `;
+
+    const spinner = loader.querySelector(".loader-spinner");
+    spinner.style.cssText = `
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    `;
+
+    // Add keyframes for the spinner
+    if (!document.getElementById("loader-keyframes")) {
+      const style = document.createElement("style");
+      style.id = "loader-keyframes";
+      style.textContent = `
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    document.body.appendChild(loader);
+  } else {
+    loader.style.display = "flex";
+    loader.style.opacity = "1";
+  }
+}
+
+// Hide loader after transition is complete
+function hideDarkModeLoader() {
+  const loader = document.getElementById("dark-mode-loader");
+  if (loader) {
+    loader.style.opacity = "0";
+    setTimeout(() => {
+      loader.style.display = "none";
+    }, 300);
+  }
+}

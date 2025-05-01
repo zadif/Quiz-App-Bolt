@@ -38,8 +38,15 @@ function showProgressModal(savedProgress, savedScore) {
     `;
   document.body.appendChild(modal);
   document.body.classList.add("modal-open"); // Add blur effect
-  document.querySelector(".chat-sidebar").classList.remove("open"); // Ensure chat box appears closed
-  document.querySelector(".chat-sidebar").style.display = "none"; // Hide chat box
+
+  // Safely handle chat sidebar
+  const chatSidebar = document.querySelector(".chat-sidebar");
+  if (chatSidebar) {
+    chatSidebar.classList.remove("open"); // Ensure chat box appears closed
+    // Store original display value before hiding
+    chatSidebar.dataset.originalDisplay = chatSidebar.style.display || "";
+    chatSidebar.style.display = "none"; // Hide chat box
+  }
 }
 
 function continueProgress(savedProgress, savedScore) {
@@ -61,7 +68,14 @@ function closeProgressModal() {
   if (modal) {
     modal.remove();
     document.body.classList.remove("modal-open"); // Remove blur effect
-    document.querySelector(".chat-sidebar").style.display = ""; // Reset chat box display
+
+    // Properly restore chat sidebar visibility
+    const chatSidebar = document.querySelector(".chat-sidebar");
+    if (chatSidebar) {
+      // Restore original display value
+      chatSidebar.style.display = chatSidebar.dataset.originalDisplay || "";
+      delete chatSidebar.dataset.originalDisplay;
+    }
   }
 }
 
@@ -562,7 +576,18 @@ if (typeof initializeDarkMode !== "function") {
 // Initialize
 document.addEventListener("DOMContentLoaded", () => {
   initializeProgress();
-  initializeDarkMode();
+
+  // Initialize dark mode if the function exists
+  if (typeof initializeDarkMode === "function") {
+    initializeDarkMode();
+  } else {
+    // Fallback dark mode initialization
+    const darkMode = localStorage.getItem("darkMode");
+    if (darkMode === "enabled") {
+      document.documentElement.classList.add("dark-mode");
+      document.body.classList.add("dark-mode");
+    }
+  }
 
   // Add event listener for chat toggle to initialize resize handle
   const chatBtn = document.querySelector(".chat-button");
@@ -581,20 +606,53 @@ document.addEventListener("DOMContentLoaded", () => {
       closeChat();
     });
   }
+
+  // Apply dark mode styles if needed
+  if (
+    localStorage.getItem("darkMode") === "enabled" &&
+    typeof applyDarkMode === "function"
+  ) {
+    setTimeout(applyDarkMode, 100);
+  }
 });
 
 function copyQuestionToChat(question) {
-  const chatInput = document.getElementById("chatInput");
-  chatInput.value = question;
+  try {
+    const chatInput = document.getElementById("chatInput");
+    if (!chatInput) {
+      console.error("Chat input element not found");
+      return;
+    }
 
-  // Open chat if it's closed
-  const sidebar = document.querySelector(".chat-sidebar");
-  if (!sidebar.classList.contains("open")) {
-    toggleChat();
-    // Initialize resize handle after opening
-    setTimeout(initResizeHandle, 100);
+    chatInput.value = question;
+
+    // Open chat if it's closed
+    const sidebar = document.querySelector(".chat-sidebar");
+    if (!sidebar) {
+      console.error("Chat sidebar element not found");
+      return;
+    }
+
+    // Fix visibility in case it was hidden
+    if (sidebar.style.display === "none") {
+      sidebar.style.display = "";
+    }
+
+    if (!sidebar.classList.contains("open")) {
+      sidebar.classList.add("open");
+      // Initialize resize handle after opening
+      setTimeout(initResizeHandle, 100);
+    }
+
+    // Focus on the input
+    chatInput.focus();
+
+    // Scroll to make the button visible
+    window.scrollTo({
+      top: chatInput.getBoundingClientRect().top + window.scrollY - 100,
+      behavior: "smooth",
+    });
+  } catch (error) {
+    console.error("Error copying question to chat:", error);
   }
-
-  // Focus on the input
-  chatInput.focus();
 }
